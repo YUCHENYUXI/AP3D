@@ -74,6 +74,7 @@ parser.add_argument('--gpu', default='0, 1', type=str,
 args = parser.parse_args()
 
 def main():
+    #%% set random seeds & check GPU
     torch.manual_seed(args.seed)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     use_gpu = torch.cuda.is_available()
@@ -87,10 +88,10 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
     else:
         print("Currently using CPU (GPU is highly recommended)")
-
+    #%% Load data
     print("Initializing dataset {}".format(args.dataset))
     dataset = data_manager.init_dataset(name=args.dataset, root=args.root)
-
+#%%
     # Data augmentation
     spatial_transform_train = ST.Compose([
                 ST.Scale((args.height, args.width), interpolation=3),
@@ -106,7 +107,7 @@ def main():
                 ST.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
     temporal_transform_test = TT.TemporalBeginCrop()
-
+#%%
     pin_memory = True if use_gpu else False
 
     if args.dataset != 'mars':
@@ -117,20 +118,42 @@ def main():
             pin_memory=pin_memory, drop_last=True)
     else:
         trainloader = DataLoader(
-            VideoDataset(dataset.train, spatial_transform=spatial_transform_train, temporal_transform=temporal_transform_train),
-            sampler=RandomIdentitySampler(dataset.train, num_instances=args.num_instances),
-            batch_size=args.train_batch, num_workers=args.workers,
-            pin_memory=pin_memory, drop_last=True)
+                VideoDataset(
+                    dataset.train,
+                    spatial_transform=spatial_transform_train,
+                    temporal_transform=temporal_transform_train
+                ),
+                sampler=RandomIdentitySampler(
+                    dataset.train, 
+                    num_instances=args.num_instances
+                ),
+            batch_size=args.train_batch, 
+            num_workers=args.workers,
+            pin_memory=pin_memory, drop_last=True
+            )
 
     queryloader = DataLoader(
-        VideoDataset(dataset.query, spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test),
-        batch_size=args.test_batch, shuffle=False, num_workers=0,
-        pin_memory=pin_memory, drop_last=False)
+            VideoDataset(
+                dataset.query, 
+                spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test
+            ),
+            batch_size=args.test_batch, 
+            shuffle=False, 
+            num_workers=0,
+            pin_memory=pin_memory, 
+            drop_last=False
+        )
 
     galleryloader = DataLoader(
-        VideoDataset(dataset.gallery, spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test),
-        batch_size=args.test_batch, shuffle=False, num_workers=0,
-        pin_memory=pin_memory, drop_last=False)
+        VideoDataset(
+            dataset.gallery, 
+            spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test
+            ),
+        batch_size=args.test_batch, 
+        shuffle=False, 
+        num_workers=0,
+        pin_memory=pin_memory, 
+        drop_last=False)
 
     print("Initializing model: {}".format(args.arch))
     model = models.init_model(name=args.arch, num_classes=dataset.num_train_pids)
