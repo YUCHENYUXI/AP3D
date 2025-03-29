@@ -26,7 +26,7 @@ from tools.losses import TripletLoss
 from tools.utils import AverageMeter, Logger, save_checkpoint
 from tools.eval_metrics import evaluate
 from tools.samplers import RandomIdentitySampler
-
+#%% 导包
 parser = argparse.ArgumentParser(description='Train AP3D')
 # Datasets
 parser.add_argument('--root', type=str, default='/home/guxinqian/data/')
@@ -72,7 +72,7 @@ parser.add_argument('--gpu', default='0, 1', type=str,
                     help='gpu device ids for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
-
+#%% 参数解析器
 def main():
     #%% set random seeds & check GPU
     torch.manual_seed(args.seed)
@@ -116,7 +116,7 @@ def main():
             sampler=RandomIdentitySampler(dataset.train_dense, num_instances=args.num_instances),
             batch_size=args.train_batch, num_workers=args.workers,
             pin_memory=pin_memory, drop_last=True)
-    else:
+    else:#
         trainloader = DataLoader(
                 VideoDataset(
                     dataset.train,
