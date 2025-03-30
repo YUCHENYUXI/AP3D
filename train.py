@@ -74,10 +74,6 @@ def defParser():
 
     return parser.parse_args()
 
-args = defParser()
-
-
-
 
 def train(epoch, model, criterion_xent, criterion_htri, optimizer, trainloader, use_gpu):
     batch_xent_loss = AverageMeter()
@@ -141,8 +137,6 @@ def train(epoch, model, criterion_xent, criterion_htri, optimizer, trainloader, 
           xent=batch_xent_loss, htri=batch_htri_loss,
           acc=batch_corrects))
     
-
-
 
 def test(model, queryloader, galleryloader, use_gpu, ranks=[1, 5, 10, 20]):
     # test using 4 frames
@@ -223,11 +217,8 @@ def test(model, queryloader, galleryloader, use_gpu, ranks=[1, 5, 10, 20]):
     return cmc[0]
 
 
-
-
-
 def main():
-    # 初始化种子设备日志器gpu
+    # 初始化
     torch.manual_seed(args.seed)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     use_gpu = torch.cuda.is_available()
@@ -241,12 +232,12 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
     else:
         print("Currently using CPU (GPU is highly recommended)")
-
+    
     # dataset数据集
     print("Initializing dataset {}".format(args.dataset))
     dataset = data_manager.init_dataset(name=args.dataset, root=args.root)
-# 变换器
-    # Data augmentation
+    
+    # 数据增强
     spatial_transform_train = ST.Compose([
                 ST.Scale((args.height, args.width), interpolation=3),
                 ST.RandomHorizontalFlip(),
@@ -261,9 +252,9 @@ def main():
                 ST.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
     temporal_transform_test = TT.TemporalBeginCrop()
-# 显存优化
+    
+    # dataloader
     pin_memory = False
-# dataloader
     if args.dataset != 'mars':
         trainloader = DataLoader(
             VideoDataset(dataset.train_dense, spatial_transform=spatial_transform_train, temporal_transform=temporal_transform_train),
@@ -286,7 +277,7 @@ def main():
         VideoDataset(dataset.gallery, spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test),
         batch_size=args.test_batch, shuffle=False, num_workers=0,
         pin_memory=pin_memory, drop_last=False)
-# dataloader end，begin model
+    # model
     print("Initializing model: {}".format(args.arch))
     model = models.init_model(name=args.arch, num_classes=dataset.num_train_pids)
     print("Model size: {:.5f}M".format(sum(p.numel() for p in model.parameters())/1000000.0))
@@ -353,4 +344,5 @@ def main():
 
 
 if __name__ == '__main__':
+    args = defParser()
     main()
