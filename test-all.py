@@ -66,8 +66,8 @@ def main():
                 ST.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
     temporal_transform_test = None
-
-    pin_memory = True if use_gpu else False
+# 显存优化
+    pin_memory = False
 
     queryloader = DataLoader(
         VideoDataset(dataset.query, spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test),

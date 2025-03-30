@@ -74,6 +74,7 @@ parser.add_argument('--gpu', default='0, 1', type=str,
 args = parser.parse_args()
 
 def main():
+    # 初始化种子设备日志器gpu
     torch.manual_seed(args.seed)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     use_gpu = torch.cuda.is_available()
@@ -88,9 +89,10 @@ def main():
     else:
         print("Currently using CPU (GPU is highly recommended)")
 
+    # dataset数据集
     print("Initializing dataset {}".format(args.dataset))
     dataset = data_manager.init_dataset(name=args.dataset, root=args.root)
-
+# 变换器
     # Data augmentation
     spatial_transform_train = ST.Compose([
                 ST.Scale((args.height, args.width), interpolation=3),
@@ -106,9 +108,9 @@ def main():
                 ST.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
     temporal_transform_test = TT.TemporalBeginCrop()
-
-    pin_memory = True if use_gpu else False
-
+# 显存优化
+    pin_memory = False
+# dataloader
     if args.dataset != 'mars':
         trainloader = DataLoader(
             VideoDataset(dataset.train_dense, spatial_transform=spatial_transform_train, temporal_transform=temporal_transform_train),
@@ -131,7 +133,7 @@ def main():
         VideoDataset(dataset.gallery, spatial_transform=spatial_transform_test, temporal_transform=temporal_transform_test),
         batch_size=args.test_batch, shuffle=False, num_workers=0,
         pin_memory=pin_memory, drop_last=False)
-
+# dataloader end，begin model
     print("Initializing model: {}".format(args.arch))
     model = models.init_model(name=args.arch, num_classes=dataset.num_train_pids)
     print("Model size: {:.5f}M".format(sum(p.numel() for p in model.parameters())/1000000.0))
