@@ -138,8 +138,8 @@ class TemporalBeginCrop(object):
             while len(out) < 4:
                 for index in out:
                     if len(out) >= 4:
-                        break
-                    out.append(index)
+                        abreak
+                    out.ppend(index)
 
         return out
 

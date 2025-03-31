@@ -1,0 +1,19 @@
+==========
+Args:Namespace(arch='ap3dres50', dataset='mars', distance='cosine', gpu='0', height=256, resume='log-mars-ap3d', root='../data/', test_epochs=[240], test_frames=32, width=128, workers=4)
+==========
+Initializing dataset mars
+=> MARS loaded
+Dataset statistics:
+  ------------------------------
+  subset   | # ids | # tracklets
+  ------------------------------
+  train    |   625 |     8298
+  query    |   626 |     1980
+  gallery  |   622 |     9330
+  ------------------------------
+  total    |  1247 |    19608
+  number of images per tracklet: 2 ~ 920, average 59.5
+  ------------------------------
+Initializing model: ap3dres50
+Model size: 25.52395M
+Loading checkpoint from 'log-mars-ap3d/checkpoint_ep240.pth.tar'
