@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AP3D调试",
+            "type": "python",
+            "request": "launch",
+            // AP3D/train.py
+            "program": "${workspaceFolder}/train.py", // 关键修改点1
+            "args": [
+                "--root",                "../data",
+                "-d",                "mars",
+                "--arch",                "ap3dres50",
+                "--gpu",                "0",
+                "--save_dir",                "log-mars-ap3d"
+            ],
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            },
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}" // 关键修改点2
+        },
+        {
+            "name": "AP3D模块化",
+            "type": "python",
+            "request": "launch",
+            // AP3D/train.py
+            "program": "${workspaceFolder}/main.py", // 关键修改点1
+            "args": [
+                "--root",                "../data",
+                "-d",                "mars",
+                "--arch",                "ap3dres50",
+                "--gpu",                "0",
+                "--save_dir",                "log-mars-ap3d"
+            ],
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            },
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}" // 关键修改点2
+        },
+    ]
+}
